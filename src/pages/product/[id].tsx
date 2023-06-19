@@ -8,6 +8,9 @@ import {
 } from "@/styles/pages/product";
 import { GetStaticProps, GetStaticPaths } from "next/types";
 import Image from "next/image";
+import { api } from "@/lib/axios";
+import { useState } from "react";
+import Head from "next/head";
 
 interface ProdDetailProps {
   product: {
@@ -16,36 +19,70 @@ interface ProdDetailProps {
     imageUrl: string;
     description: string;
     price: string;
+    defaultPriceId: string;
   };
 }
 
 export default function Product({ product }: ProdDetailProps) {
-  // //this is if fallback: true, instead of blocking
+  // //this is if fallback is true, instead of blocking (getStaticPaths
   // const { isFallback } = useRouter();
   // if (isFallback) {
   //   return <p>Loading...</p>;
   // }
 
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false);
+
+  const handleBuyProduct = async () => {
+    try {
+      setIsCreatingCheckoutSession(true);
+
+      const res = await api.post(`/checkout`, {
+        priceId: product.defaultPriceId,
+      });
+      const { checkoutUrl } = res.data;
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      // should connect to Datadog or Sentry or any other observability tool
+      setIsCreatingCheckoutSession(false);
+
+      alert("error when trying to buy product 😭");
+      console.error(error);
+    }
+    console.log(product.defaultPriceId);
+  };
+
   return (
-    <ProductContainer>
-      <ImageContainer>
-        <Image
-          src={product.imageUrl}
-          width={520}
-          height={480}
-          alt="product image"
-        />
-      </ImageContainer>
+    <>
+      <Head>
+        <title>{product.name} | rebike Shop</title>
+      </Head>
 
-      <ProductDetails>
-        <h1>{product.name}</h1>
-        <span>{product.price}</span>
+      <ProductContainer>
+        <ImageContainer>
+          <Image
+            src={product.imageUrl}
+            width={520}
+            height={480}
+            alt="product image"
+          />
+        </ImageContainer>
 
-        <p>{product.description}</p>
+        <ProductDetails>
+          <h1>{product.name}</h1>
+          <span>{product.price}</span>
 
-        <button>Grab this one</button>
-      </ProductDetails>
-    </ProductContainer>
+          <p>{product.description}</p>
+
+          <button
+            disabled={isCreatingCheckoutSession}
+            onClick={handleBuyProduct}
+          >
+            Grab it!
+          </button>
+        </ProductDetails>
+      </ProductContainer>
+    </>
   );
 }
 
@@ -67,6 +104,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       style: "currency",
       currency: "BRL",
     }).format(Number(price.unit_amount) / 100),
+    defaultPriceId: price.id,
   };
 
   return {

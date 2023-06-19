@@ -9,6 +9,7 @@ import { stripe } from "@/lib/stripe";
 import { Stripe } from "stripe";
 import { HomeContainer, Product } from "@/styles/pages/home";
 import Link from "next/link";
+import Head from "next/head";
 
 interface HomeProps {
   products: {
@@ -30,26 +31,35 @@ export default function Home({ products }: HomeProps) {
   });
 
   return (
-    <HomeContainer>
-      <div ref={sliderRef} className="keen-slider">
-        {products.map((p, idx) => {
-          return (
-            <div key={p.id} className={`keen-slider__slide number-slide${idx}`}>
-              {/* prefetch false prefetches only on hover */}
-              <Link href={`/product/${p.id}`} prefetch={false}>
-                <Product>
-                  <Image src={p.imageUrl} width={520} height={480} alt="" />
-                  <footer>
-                    <strong>{p.name}</strong>
-                    <span>{p.price}</span>
-                  </footer>
-                </Product>
-              </Link>
-            </div>
-          );
-        })}
-      </div>
-    </HomeContainer>
+    <>
+      <Head>
+        <title>Home | rebike Shop</title>
+      </Head>
+
+      <HomeContainer>
+        <div ref={sliderRef} className="keen-slider">
+          {products.map((p, idx) => {
+            return (
+              <div
+                key={p.id}
+                className={`keen-slider__slide number-slide${idx}`}
+              >
+                {/* prefetch false prefetches only on hover */}
+                <Link href={`/product/${p.id}`} prefetch={false}>
+                  <Product>
+                    <Image src={p.imageUrl} width={520} height={480} alt="" />
+                    <footer>
+                      <strong>{p.name}</strong>
+                      <span>{p.price}</span>
+                    </footer>
+                  </Product>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </HomeContainer>
+    </>
   );
 }
 
