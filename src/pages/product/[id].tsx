@@ -55,7 +55,7 @@ export default function Product({ product }: ProdDetailProps) {
   return (
     <>
       <Head>
-        <title>{product.name} | rebike Shop</title>
+        <title>{`${product.name} | rebike Shop`}</title>
       </Head>
 
       <ProductContainer>

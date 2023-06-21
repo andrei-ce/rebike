@@ -22,8 +22,8 @@ interface HomeProps {
 
 export default function Home({ products }: HomeProps) {
   const [sliderRef] = useKeenSlider<HTMLDivElement>({
-    loop: true,
-    rtl: true,
+    loop: false,
+    rtl: false,
     slides: {
       perView: 3,
       spacing: 38,
@@ -33,7 +33,7 @@ export default function Home({ products }: HomeProps) {
   return (
     <>
       <Head>
-        <title>Home | rebike Shop</title>
+        <title>{`Home | rebike Shop`}</title>
       </Head>
 
       <HomeContainer>
