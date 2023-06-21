@@ -47,8 +47,16 @@ export const ProductList = styled("ul", {
   listStyle: "none",
   margin: "0 0 auto 0",
   padding: 0,
-  display: "flex-column",
+  display: "flex",
+  flexDirection: "column",
   flexGrow: 1,
+
+  overflowY: "scroll",
+  "&::-webkit-scrollbar": {
+    display: "none", //Chrome, Safari and Opera
+  },
+  "-ms-overflow-style": "none" /* IE and Edge */,
+  "scrollbar-width": "none" /* Firefox */,
 
   li: {
     display: "grid",

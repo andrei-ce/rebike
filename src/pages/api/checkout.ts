@@ -14,6 +14,11 @@ export default async function checkout(
   // 2. make call to create checkout cart
   const successUrl = `${process.env.NEXT_URL}/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${process.env.NEXT_URL}/`;
+
+  // 2b) TODO: iterate over all products to provide as part of line_items
+  //
+  //
+
   const checkoutSessions = await stripe.checkout.sessions.create({
     success_url: successUrl,
     cancel_url: cancelUrl,

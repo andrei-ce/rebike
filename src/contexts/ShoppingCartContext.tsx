@@ -10,10 +10,10 @@ import {
   ProductItem,
 } from "../reducers/shoppingCart/reducer";
 import {
-  // addNewProductItemAction,
-  // checkoutShoppingCartAction,
-  // removeProductItemAction,
   toggleShoppingCartAction,
+  addNewProductItemAction,
+  removeProductItemAction,
+  // checkoutShoppingCartAction,
 } from "../reducers/shoppingCart/actions";
 
 interface ShoppingCartStateInterface {
@@ -22,8 +22,8 @@ interface ShoppingCartStateInterface {
   totalPrice: number | null; //string?
   isOpened: boolean;
   toggleShoppingCartSidebar: (o: boolean) => void;
-  // addProductItem: (p: ProductItem) => void;
-  // removeProductItem: (p: ProductItem) => void;
+  addProductItem: (p: ProductItem) => void;
+  removeProductItem: (p: ProductItem) => void;
   // checkoutShoppingCart: () => void;
 }
 
@@ -68,6 +68,14 @@ export function ShoppingCartContextProvider({
     dispatch(toggleShoppingCartAction(isOpened));
   }
 
+  function addProductItem(p: ProductItem) {
+    dispatch(addNewProductItemAction(p));
+  }
+
+  function removeProductItem(p: ProductItem) {
+    dispatch(removeProductItemAction(p));
+  }
+
   return (
     <ShoppingCartContext.Provider
       value={{
@@ -76,8 +84,8 @@ export function ShoppingCartContextProvider({
         totalPrice,
         isOpened,
         toggleShoppingCartSidebar,
-        // addProductItem,
-        // removeProductItem,
+        addProductItem,
+        removeProductItem,
         // checkoutShoppingCart,
       }}
     >

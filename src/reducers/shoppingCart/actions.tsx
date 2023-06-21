@@ -10,18 +10,14 @@ export enum ActionTypes {
 export function addNewProductItemAction(productItem: ProductItem) {
   return {
     type: ActionTypes.ADD_NEW_PRODUCT_ITEM,
-    payload: {
-      productItem,
-    },
+    payload: productItem,
   };
 }
 
 export function removeProductItemAction(productItem: ProductItem) {
   return {
     type: ActionTypes.REMOVE_PRODUCT_ITEM,
-    payload: {
-      productItem,
-    },
+    payload: productItem,
   };
 }
 

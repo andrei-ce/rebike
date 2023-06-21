@@ -3,10 +3,10 @@ import { ActionTypes } from "./actions";
 export interface ProductItem {
   id: string;
   name: string;
-  imageUrl: number;
-  description: Date;
-  price: number; //string?
-  defaultPriceId: number; //string?
+  imageUrl: string;
+  description: string;
+  price: number;
+  defaultPriceId: string;
 }
 
 interface ShoppingCartState {
@@ -27,22 +27,33 @@ export function shoppingCartReducer(state: ShoppingCartState, action: any) {
     }
 
     case ActionTypes.ADD_NEW_PRODUCT_ITEM: {
-      const { newProductItem } = action.payload;
+      const productItem = action.payload;
+
+      if (state.productItems.map((p) => p.id).includes(productItem.id)) {
+        console.log("this only runs twice in dev mode");
+        alert(`${productItem.name} already added to your shopping cart!`);
+        return state;
+      }
+
       return {
         ...state,
-        productItems: [...state.productItems, newProductItem],
+        productItems: [...state.productItems, productItem],
         quantity: state.quantity + 1,
-        totalPrice: state.totalPrice + newProductItem.price,
+        totalPrice: state.totalPrice + productItem.price,
       };
     }
     case ActionTypes.REMOVE_PRODUCT_ITEM: {
       console.log("item being removed...");
-      const { newProductItem } = action.payload;
+      const productToRemove = action.payload;
+      const newProductList = state.productItems.filter(
+        (p) => p.id !== productToRemove.id
+      );
 
-      console.log("item removed: ");
-      console.log(newProductItem);
       return {
         ...state,
+        productItems: newProductList,
+        quantity: state.quantity - 1,
+        totalPrice: state.totalPrice - productToRemove.price,
       };
     }
     case ActionTypes.CHECKOUT_SHOPPING_CART: {

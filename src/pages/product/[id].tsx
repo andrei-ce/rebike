@@ -8,9 +8,10 @@ import {
 } from "@/styles/pages/product";
 import { GetStaticProps, GetStaticPaths } from "next/types";
 import Image from "next/image";
-import { api } from "@/lib/axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Head from "next/head";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext";
+import { formatToBRL } from "@/utils/currencyFormatter";
 
 interface ProdDetailProps {
   product: {
@@ -18,7 +19,7 @@ interface ProdDetailProps {
     name: string;
     imageUrl: string;
     description: string;
-    price: string;
+    price: number;
     defaultPriceId: string;
   };
 }
@@ -29,27 +30,12 @@ export default function Product({ product }: ProdDetailProps) {
   // if (isFallback) {
   //   return <p>Loading...</p>;
   // }
-
+  const { addProductItem } = useContext(ShoppingCartContext);
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false);
 
-  const handleBuyProduct = async () => {
-    try {
-      setIsCreatingCheckoutSession(true);
-
-      const res = await api.post(`/checkout`, {
-        priceId: product.defaultPriceId,
-      });
-      const { checkoutUrl } = res.data;
-      window.location.href = checkoutUrl;
-    } catch (error) {
-      // should connect to Datadog or Sentry or any other observability tool
-      setIsCreatingCheckoutSession(false);
-
-      alert("error when trying to buy product 😭");
-      console.error(error);
-    }
-    console.log(product.defaultPriceId);
+  const handleAddProduct = (props: ProdDetailProps) => {
+    addProductItem(props.product);
   };
 
   return (
@@ -70,15 +56,16 @@ export default function Product({ product }: ProdDetailProps) {
 
         <ProductDetails>
           <h1>{product.name}</h1>
-          <span>{product.price}</span>
+          <span>{formatToBRL(product.price)}</span>
 
           <p>{product.description}</p>
 
           <button
             disabled={isCreatingCheckoutSession}
-            onClick={handleBuyProduct}
+            onClick={() => handleAddProduct({ product })}
+            title="Add this to my shopping cart"
           >
-            Grab it!
+            Want it!
           </button>
         </ProductDetails>
       </ProductContainer>
@@ -100,10 +87,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     name: res.name,
     imageUrl: res.images[0],
     description: res.description,
-    price: new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(Number(price.unit_amount) / 100),
+    price: Number(price.unit_amount) / 100,
     defaultPriceId: price.id,
   };
 

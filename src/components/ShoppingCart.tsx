@@ -6,16 +6,23 @@ import {
   ProductItemDescription,
   TotalDetails,
 } from "../styles/components/ShoppingCart";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext";
+import { api } from "@/lib/axios";
+import { useContext, useState } from "react";
 import { X } from "@phosphor-icons/react";
 import Image from "next/image";
-
-import testimg from "../assets/brake.png";
-import { useContext, useState } from "react";
-import { ShoppingCartContext } from "@/contexts/ShoppingCartContext";
+import { formatToBRL } from "@/utils/currencyFormatter";
+import { ProductItem } from "@/reducers/shoppingCart/reducer";
 
 export default function ShoppingCartSlider() {
-  const { isOpened, toggleShoppingCartSidebar } =
-    useContext(ShoppingCartContext);
+  const {
+    productItems,
+    quantity,
+    totalPrice,
+    isOpened,
+    toggleShoppingCartSidebar,
+    removeProductItem,
+  } = useContext(ShoppingCartContext);
 
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false);
@@ -24,6 +31,13 @@ export default function ShoppingCartSlider() {
     toggleShoppingCartSidebar(false);
   };
 
+  //TODO
+  const handleRemoveProduct = (productItem: ProductItem) => {
+    console.log("removing product: ", productItem);
+    removeProductItem(productItem);
+  };
+
+  //TODO
   const handleCheckout = async () => {
     console.log("handling checkout...");
 
@@ -53,38 +67,36 @@ export default function ShoppingCartSlider() {
         </div>
         <h1>Shopping Cart</h1>
       </ShoppingCartHeader>
-      <ProductList>
-        <li>
-          <ImageContainer>
-            <Image src={testimg} height={90} width={90} alt="" />
-          </ImageContainer>
-          <ProductItemDescription>
-            <h3>Handlebar X-pro</h3>
-            <span>R$ 49,99</span>
-            <span>Remove</span>
-          </ProductItemDescription>
-        </li>
 
-        <li>
-          <ImageContainer>
-            <Image src={testimg} height={90} width={90} alt="" />
-          </ImageContainer>
-          <ProductItemDescription>
-            <h3>Paul Components V-brake</h3>
-            <span>R$ 50,99</span>
-            <span>Remove</span>
-          </ProductItemDescription>
-        </li>
+      <ProductList>
+        {productItems.length < 1 ? (
+          <div>No items added yet</div>
+        ) : (
+          productItems.map((p) => {
+            return (
+              <li key={p.id}>
+                <ImageContainer>
+                  <Image src={p.imageUrl} height={90} width={90} alt="" />
+                </ImageContainer>
+                <ProductItemDescription>
+                  <h3>{p.name}</h3>
+                  <span>{formatToBRL(p.price)}</span>
+                  <span onClick={() => handleRemoveProduct(p)}>Remove</span>
+                </ProductItemDescription>
+              </li>
+            );
+          })
+        )}
       </ProductList>
 
       <TotalDetails>
         <div>
           <span>Items</span>
-          <span>3 parts</span>
+          <span>{quantity} parts</span>
         </div>
         <div>
           <strong>Total</strong>
-          <strong>R$ 100,98</strong>
+          <strong>{formatToBRL(totalPrice)}</strong>
         </div>
         <button disabled={isCreatingCheckoutSession} onClick={handleCheckout}>
           Checkout & Pay
