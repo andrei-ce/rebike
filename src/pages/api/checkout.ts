@@ -5,9 +5,10 @@ export default async function checkout(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // 1. receive product(s)
-  const { priceId } = req.body;
-  if (!priceId) return res.status(400).json({ error: "Price not found" });
+  // 1. receive product(s) id(s)
+  const { priceIds } = req.body;
+  if (priceIds.length < 1)
+    return res.status(400).json({ error: "Price not found" });
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
@@ -17,18 +18,17 @@ export default async function checkout(
 
   // 2b) TODO: iterate over all products to provide as part of line_items
   //
-  //
+  const lineItems = priceIds.map((price) => {
+    return { price, quantity: 1 };
+  });
+
+  console.log(lineItems);
 
   const checkoutSessions = await stripe.checkout.sessions.create({
     success_url: successUrl,
     cancel_url: cancelUrl,
     mode: "payment",
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
   });
 
   // 3. redirect user to stripe.com/checkout --> in client side component after the response below is sent

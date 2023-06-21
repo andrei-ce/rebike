@@ -31,24 +31,23 @@ export default function ShoppingCartSlider() {
     toggleShoppingCartSidebar(false);
   };
 
-  //TODO
   const handleRemoveProduct = (productItem: ProductItem) => {
-    console.log("removing product: ", productItem);
     removeProductItem(productItem);
   };
 
   //TODO
-  const handleCheckout = async () => {
+  const handleCheckout = async (productItems: ProductItem[]) => {
     console.log("handling checkout...");
 
     try {
       setIsCreatingCheckoutSession(true);
 
-      // const res = await api.post(`/checkout`, {
-      //   priceId: product.defaultPriceId,
-      // });
-      // const { checkoutUrl } = res.data;
-      // window.location.href = checkoutUrl;
+      const res = await api.post(`/checkout`, {
+        priceIds: productItems.map((p) => p.defaultPriceId),
+      });
+
+      const { checkoutUrl } = res.data;
+      window.location.href = checkoutUrl;
     } catch (error) {
       // should connect to Datadog or Sentry or any other observability tool
       setIsCreatingCheckoutSession(false);
@@ -98,7 +97,10 @@ export default function ShoppingCartSlider() {
           <strong>Total</strong>
           <strong>{formatToBRL(totalPrice)}</strong>
         </div>
-        <button disabled={isCreatingCheckoutSession} onClick={handleCheckout}>
+        <button
+          // disabled={isCreatingCheckoutSession}
+          onClick={() => handleCheckout(productItems)}
+        >
           Checkout & Pay
         </button>
       </TotalDetails>

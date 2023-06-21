@@ -18,6 +18,7 @@ interface ShoppingCartState {
 
 export function shoppingCartReducer(state: ShoppingCartState, action: any) {
   switch (action.type) {
+    //probably overkill and could be a useState in the navbar
     case ActionTypes.TOGGLE_SHOPPING_CART: {
       const { isOpened } = action.payload;
       return {
@@ -42,6 +43,7 @@ export function shoppingCartReducer(state: ShoppingCartState, action: any) {
         totalPrice: state.totalPrice + productItem.price,
       };
     }
+
     case ActionTypes.REMOVE_PRODUCT_ITEM: {
       console.log("item being removed...");
       const productToRemove = action.payload;
@@ -56,13 +58,18 @@ export function shoppingCartReducer(state: ShoppingCartState, action: any) {
         totalPrice: state.totalPrice - productToRemove.price,
       };
     }
-    case ActionTypes.CHECKOUT_SHOPPING_CART: {
-      console.log("checkout requested...");
+
+    case ActionTypes.CLEAR_SHOPPING_CART: {
+      console.log("checkout requested, cleaning up hsoppingCart...");
 
       return {
-        ...state,
+        productItems: [],
+        quantity: null,
+        totalPrice: null,
+        isOpened: false,
       };
     }
+
     default:
       return state;
   }

@@ -4,18 +4,29 @@ import Head from "next/head";
 import Link from "next/link";
 import Stripe from "stripe";
 import { stripe } from "../lib/stripe";
-import { ImageContainer, SuccessContainer } from "../styles/pages/success";
+import {
+  ImageContainer,
+  ImageContainerWrapper,
+  SuccessContainer,
+} from "../styles/pages/success";
+import { useContext } from "react";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext";
 
 interface SuccessProps {
   customerName: string;
-  product: {
-    name: string;
-    imageUrl: string;
+  productsBought: {
+    quantity: number;
+    imageUrls: string[];
   };
 }
 
-export default function Success({ customerName, product }: SuccessProps) {
-  if (!customerName || !product)
+export default function Success({
+  customerName,
+  productsBought,
+}: SuccessProps) {
+  const { clearShoppingCart } = useContext(ShoppingCartContext);
+
+  if (!customerName || productsBought.quantity <= 0) {
     return (
       <SuccessContainer>
         <h1>Oops...</h1>
@@ -28,6 +39,8 @@ export default function Success({ customerName, product }: SuccessProps) {
         <Link href="/">Go back to main catalog</Link>
       </SuccessContainer>
     );
+  }
+
   return (
     <>
       <Head>
@@ -39,13 +52,21 @@ export default function Success({ customerName, product }: SuccessProps) {
       <SuccessContainer>
         <h1>Successful Purchase!</h1>
 
-        <ImageContainer>
-          <Image src={product.imageUrl} width={120} height={110} alt="" />
-        </ImageContainer>
+        <ImageContainerWrapper>
+          {productsBought.imageUrls.map((img) => {
+            return (
+              <ImageContainer key={img}>
+                <Image src={img} width={120} height={110} alt="" />
+              </ImageContainer>
+            );
+          })}
+        </ImageContainerWrapper>
 
         <p>
-          YEAH, <strong>{customerName}</strong>, your{" "}
-          <strong>{product.name}</strong> is on its way.
+          YEAH <strong>{customerName.split(" ")[0]}</strong>, your{" "}
+          {productsBought.quantity === 1
+            ? "bike part is on its way!"
+            : `${productsBought.quantity} bike parts are on their way!`}
         </p>
 
         <Link href="/">Go back to main catalog</Link>
@@ -65,20 +86,24 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   }
 
   const sessionId = String(query.session_id);
-
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["line_items", "line_items.data.price.product"],
   });
 
   const customerName = session.customer_details.name;
-  const product = session.line_items.data[0].price.product as Stripe.Product;
+  const productList = session.line_items.data.map((product) => {
+    return product.price.product as Stripe.Product;
+  });
+
+  const quantity = productList.length;
+  const imageUrls = productList.map((p) => p.images[0]);
 
   return {
     props: {
       customerName,
-      product: {
-        name: product.name,
-        imageUrl: product.images[0],
+      productsBought: {
+        quantity,
+        imageUrls,
       },
     },
   };

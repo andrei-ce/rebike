@@ -13,7 +13,7 @@ import {
   toggleShoppingCartAction,
   addNewProductItemAction,
   removeProductItemAction,
-  // checkoutShoppingCartAction,
+  clearShoppingCartAction,
 } from "../reducers/shoppingCart/actions";
 
 interface ShoppingCartStateInterface {
@@ -24,7 +24,7 @@ interface ShoppingCartStateInterface {
   toggleShoppingCartSidebar: (o: boolean) => void;
   addProductItem: (p: ProductItem) => void;
   removeProductItem: (p: ProductItem) => void;
-  // checkoutShoppingCart: () => void;
+  clearShoppingCart: () => void;
 }
 
 export const ShoppingCartContext = createContext(
@@ -76,6 +76,10 @@ export function ShoppingCartContextProvider({
     dispatch(removeProductItemAction(p));
   }
 
+  function clearShoppingCart() {
+    dispatch(clearShoppingCartAction());
+  }
+
   return (
     <ShoppingCartContext.Provider
       value={{
@@ -86,7 +90,7 @@ export function ShoppingCartContextProvider({
         toggleShoppingCartSidebar,
         addProductItem,
         removeProductItem,
-        // checkoutShoppingCart,
+        clearShoppingCart,
       }}
     >
       {children}

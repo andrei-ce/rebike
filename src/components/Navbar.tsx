@@ -23,6 +23,7 @@ export default function Navbar() {
         <ul>
           <li>
             <Handbag size={26} onClick={handleOpenShoppingCart} />
+            {quantity > 0 && <span className="badge">{quantity}</span>}
           </li>
         </ul>
       </NavbarMenuContainer>

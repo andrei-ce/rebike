@@ -30,4 +30,14 @@ export const NavbarMenuContainer = styled("nav", {
       cursor: "pointer",
     },
   },
+
+  ".badge": {
+    position: "absolute",
+    top: "0.8rem",
+    right: "1.25rem",
+    padding: "0.125rem 0.4rem",
+    borderRadius: "50%",
+    background: "rgb(201, 8, 8)",
+    color: "$gray100",
+  },
 });
